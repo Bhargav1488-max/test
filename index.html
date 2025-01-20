@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video/Audio to Text Converter</title>
+</head>
+<body>
+  <h1>Upload Video or Audio File</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" accept="audio/*,video/*" required />
+    <button type="submit">Upload and Convert</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const resultDiv = document.getElementById('result');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+
+      resultDiv.textContent = "Processing...";
+
+      const response = await fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.transcription) {
+        resultDiv.innerHTML = `
+          <h3>Transcription:</h3>
+          <p>${data.transcription}</p>
+          <a href="${data.download_url}" download>Download Text File</a>
+        `;
+      } else {
+        resultDiv.textContent = `Error: ${data.error}`;
+      }
+    });
+  </script>
+</body>
+</html>
